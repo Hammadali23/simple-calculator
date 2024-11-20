@@ -1,68 +1,40 @@
-var displayValue = '';
-var currentOperation = null;
-var firstOperand = null;
-function appendNumber(number) {
-    if (displayValue === '0' && number !== '.') {
-        displayValue = number;
-    }
-    else {
-        displayValue += number;
-    }
-    updateDisplay();
-}
-function appendOperation(operation) {
-    if (displayValue === '')
-        return;
-    if (firstOperand === null) {
-        firstOperand = parseFloat(displayValue);
-    }
-    else {
-        calculate();
-    }
-    currentOperation = operation;
-    displayValue = '';
-}
-function calculate() {
-    if (firstOperand === null || currentOperation === null)
-        return;
-    var secondOperand = parseFloat(displayValue);
-    var result;
-    switch (currentOperation) {
-        case '+':
-            result = firstOperand + secondOperand;
-            break;
-        case '-':
-            result = firstOperand - secondOperand;
-            break;
-        case '*':
-            result = firstOperand * secondOperand;
-            break;
-        case '/':
-            result = firstOperand / secondOperand;
-            break;
-        case '%':
-            result = firstOperand % secondOperand;
-            break;
-        default:
-            return;
-    }
-    displayValue = result.toString();
-    firstOperand = result;
-    currentOperation = null;
-    updateDisplay();
-}
-function clearDisplay() {
-    displayValue = '0';
-    firstOperand = null;
-    currentOperation = null;
-    updateDisplay();
-}
-function toggleSign() {
-    if (displayValue === '')
-        return;
-    displayValue = (parseFloat(displayValue) * -1).toString();
-    updateDisplay();
-}
-function updateDisplay() {
-    document.getElementById('display').value = displayValue;
-}
+var display = document.getElementById("display");
+var buttons = document.querySelectorAll(".btn");
+var currentInput = "";
+var operator = "";
+var firstOperand = "";
+buttons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        var value = button.getAttribute("data-value");
+        if (value === "C") {
+            // Clear display
+            currentInput = "";
+            firstOperand = "";
+            operator = "";
+            display.value = "";
+        }
+        else if (value === "=") {
+            // Evaluate the expression
+            if (firstOperand && operator && currentInput) {
+                var result = eval("".concat(firstOperand, " ").concat(operator, " ").concat(currentInput));
+                display.value = result.toString();
+                currentInput = result.toString();
+                firstOperand = "";
+                operator = "";
+            }
+        }
+        else if (["+", "-", "*", "/"].includes(value)) {
+            // Operator clicked
+            if (currentInput) {
+                firstOperand = currentInput;
+                operator = value;
+                currentInput = "";
+            }
+        }
+        else {
+            // Number clicked
+            currentInput += value;
+            display.value = currentInput;
+        }
+    });
+});
